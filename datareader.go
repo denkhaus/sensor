@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
+	"github.com/denkhaus/sensor/config"
 	"github.com/denkhaus/sensor/store"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/pkg/errors"
@@ -84,26 +86,18 @@ func (p *DataReader) readSensorData(dataID store.DataID) ([]byte, error) {
 	return result, nil
 }
 
-// process reads sensor data at a specified interval and publishes it to an MQTT broker.
+// process runs the data reading process.
 //
-// Parameters:
-// - updateInterval: the interval in seconds at which to read sensor data.
-// - mqttEndpoint: the MQTT endpoint to publish sensor data to.
-// - mqttClientID: the MQTT client ID.
-//
-// Returns:
-// - error: an error if there was a problem reading sensor data or publishing it to the MQTT broker.
+// It takes a configuration and error group as parameters.
+// Returns an error.
 func (p *DataReader) process(
-	updateInterval int,
-	mqttEndpoint string,
-	mqttClientID string,
-	mqttUsername string,
-	mqttPassword string,
+	ctx context.Context,
+	config *config.Config,
 	eg *errgroup.Group,
 ) error {
 
 	comChan := make(chan SensorData, ChannelSize)
-	durUpdateInterval := time.Second * time.Duration(updateInterval)
+	durUpdateInterval := time.Second * time.Duration(config.UpdateInterval)
 
 	eg.Go(func() error {
 		ticker := time.NewTicker(durUpdateInterval)
@@ -112,21 +106,30 @@ func (p *DataReader) process(
 			for dataID := store.DataID(0); dataID < store.DataID(len(sendData)); dataID++ {
 				rec, err := p.readSensorData(dataID)
 				if err != nil {
+					ticker.Stop()
 					close(comChan)
 					return errors.Wrapf(err, "error reading sensor data for id %d", dataID)
 				}
 
-				comChan <- SensorData{id: dataID, data: rec}
+				select {
+				case <-ctx.Done():
+					ticker.Stop()
+					close(comChan)
+					logger.Info("data-reader: done received -> closing")
+					return nil
+				default:
+					comChan <- SensorData{id: dataID, data: rec}
+				}
 			}
 		}
 		return nil
 	})
 
 	eg.Go(func() error {
-		opts := mqtt.NewClientOptions().AddBroker(mqttEndpoint)
-		opts.SetClientID(mqttClientID).
-			SetUsername(mqttUsername).
-			SetPassword(mqttPassword)
+		opts := mqtt.NewClientOptions().AddBroker(config.Mqtt.Endpoint)
+		opts.SetClientID(config.Mqtt.ClientID).
+			SetUsername(config.Mqtt.Username).
+			SetPassword(config.Mqtt.Password)
 
 		client := mqtt.NewClient(opts)
 		if token := client.Connect(); token.Wait() && token.Error() != nil {
@@ -136,7 +139,7 @@ func (p *DataReader) process(
 
 		qos := 0
 		for sensorData := range comChan {
-			topic := fmt.Sprintf("sensor/data/%s", sensorData.id)
+			topic := fmt.Sprintf("%s/%s/%s", config.Mqtt.TopicPrefix, config.Mqtt.ClientID, sensorData.id)
 			val := sensorData.Decode()
 			token := client.Publish(topic, byte(qos), false, val)
 
@@ -148,12 +151,9 @@ func (p *DataReader) process(
 			logger.Infof("mqtt:sent->%s: %v", topic, val)
 		}
 
+		logger.Info("mqtt-writer: channel closed -> closing")
 		return nil
 	})
-
-	if err := eg.Wait(); err != nil {
-		return fmt.Errorf("main error: %v", err)
-	}
 
 	return nil
 }
