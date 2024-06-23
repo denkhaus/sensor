@@ -6,7 +6,7 @@ default: build
 
 .PHONY: install_yaegi
 install_yaegi:
-	go install github.com/traefik/yaegi/cmd/yaegi/@latest
+	go install github.com/traefik/yaegi/cmd/yaegi@latest
 
 .PHONY: create_bin_dir
 create_bin_dir:
