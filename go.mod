@@ -3,7 +3,6 @@ module github.com/denkhaus/sensor
 go 1.22.1
 
 require (
-	github.com/SaidinWoT/timespan v0.0.0-20160403210742-a3d8e4741124
 	github.com/davecgh/go-spew v1.1.1
 	github.com/dgraph-io/badger/v4 v4.1.0
 	github.com/muesli/go-app-paths v0.2.2
@@ -37,7 +36,6 @@ require (
 	github.com/creack/goselect v0.1.2 // indirect
 	github.com/eclipse/paho.mqtt.golang v1.4.3
 	github.com/itzg/go-flagsfiller v1.14.0
-	github.com/mrmorphic/hwio v0.0.0-20180519033216-11ea3f481a14
 	github.com/timshannon/badgerhold/v4 v4.0.3
 	golang.org/x/sys v0.8.0 // indirect
 	periph.io/x/conn/v3 v3.7.0
