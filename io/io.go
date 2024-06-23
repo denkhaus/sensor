@@ -5,9 +5,12 @@ import (
 
 	"github.com/pkg/errors"
 	"periph.io/x/conn/v3/gpio"
+	"periph.io/x/host/v3"
 )
 
-//go:generate stringer -type=PinState
+func init() {
+	host.Init()
+}
 
 type Pin struct {
 	gpio.PinIO
