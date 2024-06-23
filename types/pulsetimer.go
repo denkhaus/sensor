@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/denkhaus/sensor/io"
+	"periph.io/x/conn/v3/gpio"
 )
 
 func init() {
@@ -13,7 +14,7 @@ func init() {
 
 type PulseTimer struct {
 	Name              string
-	PinName           string
+	Pin               gpio.PinIO
 	Description       string
 	CurrentSpan       Span
 	PulseDuration     time.Duration
@@ -27,13 +28,14 @@ func (p *PulseTimer) Write(ctx *ScriptContext) error {
 }
 
 func (p *PulseTimer) pulse(ctx *ScriptContext, fnCondition func() bool) error {
-	pin, err := io.NewOutputPin(p.PinName)
+	pin, err := io.NewPin(p.Pin)
 	if err != nil && p.WarnOnPinError {
-		ctx.Logger.Warnf("open digital output pin %s: %v", p.PinName, err)
+		ctx.Logger.Warnf("open digital output pin %s: %v", p.Pin, err)
 	}
 
 	defer func() {
 		if pin != nil {
+			pin.SetLow()
 			pin.Close()
 		}
 	}()

@@ -6,6 +6,7 @@ import (
 	"github.com/denkhaus/sensor/store"
 	"github.com/denkhaus/sensor/types"
 	"github.com/pkg/errors"
+	"periph.io/x/host/v3/rpi"
 )
 
 const (
@@ -70,7 +71,7 @@ func setup(ctx *types.ScriptContext) error {
 		ctx.Logger.Infof("setup pumpstatus %s", DosePumpStateIDDefault)
 
 		status1 := types.PulseTimer{
-			PinName:           "gpio13",
+			Pin:               rpi.P1_35,
 			Name:              DosePumpStateIDDefault,
 			PulseOnInitialize: true,
 			WarnOnPinError:    false,
@@ -89,7 +90,7 @@ func setup(ctx *types.ScriptContext) error {
 		ctx.Logger.Infof("setup pumpstatus %s", AquaPumpStateIDGreenhouse)
 
 		status1 := types.SwitchTimer{
-			PinName:        "gpio5",
+			Pin:            rpi.P1_32,
 			Name:           AquaPumpStateIDGreenhouse,
 			Description:    "The greenhouse pump status",
 			WarnOnPinError: false,
@@ -108,7 +109,7 @@ func setup(ctx *types.ScriptContext) error {
 		ctx.Logger.Infof("setup pumpstatus %s", AquaPumpStateIDHydroRack)
 
 		status2 := types.SwitchTimer{
-			PinName:        "gpio6",
+			Pin:            rpi.P1_38,
 			Name:           AquaPumpStateIDHydroRack,
 			Description:    "The hydrorack pump status",
 			WarnOnPinError: false,

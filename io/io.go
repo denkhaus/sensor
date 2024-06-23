@@ -3,69 +3,47 @@ package io
 import (
 	"time"
 
-	"github.com/mrmorphic/hwio"
 	"github.com/pkg/errors"
+	"periph.io/x/conn/v3/gpio"
 )
 
 //go:generate stringer -type=PinState
 
-type PinState int
-
-// Pin states
-const (
-	PinStateLow PinState = iota
-	PinStateHigh
-)
-
-func CloseAll() {
-	hwio.CloseAll()
-}
-
 type Pin struct {
-	hwio.Pin
+	gpio.PinIO
 	name string
 }
 
-func (p PinState) Negate() PinState {
-	if p == PinStateLow {
-		return PinStateHigh
-	}
-
-	return PinStateLow
-}
-
 func (p *Pin) Toggle() error {
-	state, err := p.GetState()
-	if err != nil {
-		return err
-	}
 
-	if err := p.SetState(state.Negate()); err != nil {
-		return err
+	state := p.GetState()
+
+	if state == gpio.Low {
+		if err := p.SetHigh(); err != nil {
+			return err
+		}
+	} else {
+		if err := p.SetLow(); err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
 
-func (p *Pin) SetState(state PinState) error {
-	if err := hwio.DigitalWrite(p.Pin, int(state)); err != nil {
+func (p *Pin) SetState(state gpio.Level) error {
+	if err := p.PinIO.Out(state); err != nil {
 		return errors.Wrapf(err, "set state for pin %s to %s", p.name, state)
 	}
 	return nil
 }
 
 func (p *Pin) SetHigh() error {
-	if err := hwio.DigitalWrite(p.Pin, int(PinStateHigh)); err != nil {
-		return errors.Wrapf(err, "set state for pin %s to %s", p.name, PinStateLow)
-	}
-	return nil
+	return p.SetState(gpio.High)
 }
 
 func (p *Pin) SetLow() error {
-	if err := hwio.DigitalWrite(p.Pin, int(PinStateLow)); err != nil {
-		return errors.Wrapf(err, "set state for pin %s to %s", p.name, PinStateLow)
-	}
-	return nil
+	return p.SetState(gpio.Low)
 }
 
 func (p *Pin) Pulse(dur time.Duration) error {
@@ -83,40 +61,13 @@ func (p *Pin) Pulse(dur time.Duration) error {
 }
 
 func (p *Pin) Close() error {
-	return hwio.ClosePin(p.Pin)
+	return p.PinIO.Halt()
 }
 
-func (p *Pin) GetState() (PinState, error) {
-	state, err := hwio.DigitalRead(p.Pin)
-	if err != nil {
-		return PinStateLow, errors.Wrapf(err, "get state for pin %s", p.name)
-	}
-
-	return PinState(state), nil
+func (p *Pin) GetState() gpio.Level {
+	return p.PinIO.Read()
 }
 
-func NewOutputPin(name string) (*Pin, error) {
-	pin, err := hwio.GetPin(name)
-	if err != nil {
-		return nil, errors.Wrapf(err, "create pin %s", name)
-	}
-
-	if err := hwio.PinMode(pin, hwio.OUTPUT); err != nil {
-		return nil, errors.Wrapf(err, "set pin mode for pin %s to %s", name, hwio.OUTPUT)
-	}
-
-	return &Pin{Pin: pin, name: name}, nil
-}
-
-func NewInputPin(name string) (*Pin, error) {
-	pin, err := hwio.GetPin(name)
-	if err != nil {
-		return nil, errors.Wrapf(err, "create pin %s", name)
-	}
-
-	if err := hwio.PinMode(pin, hwio.INPUT); err != nil {
-		return nil, errors.Wrapf(err, "set pin mode for pin %s to %s", name, hwio.INPUT)
-	}
-
-	return &Pin{Pin: pin, name: name}, nil
+func NewPin(pin gpio.PinIO) (*Pin, error) {
+	return &Pin{PinIO: pin}, nil
 }

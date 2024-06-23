@@ -40,4 +40,6 @@ require (
 	github.com/mrmorphic/hwio v0.0.0-20180519033216-11ea3f481a14
 	github.com/timshannon/badgerhold/v4 v4.0.3
 	golang.org/x/sys v0.8.0 // indirect
+	periph.io/x/conn/v3 v3.7.0
+	periph.io/x/host/v3 v3.8.2
 )

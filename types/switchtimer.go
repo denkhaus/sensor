@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/denkhaus/sensor/io"
+	"periph.io/x/conn/v3/gpio"
 )
 
 func init() {
@@ -21,7 +22,7 @@ const (
 
 type SwitchTimer struct {
 	Name           string
-	PinName        string
+	Pin            gpio.PinIO
 	Description    string
 	CurrentSpan    Span
 	CurrentState   SwitchTimerState
@@ -39,9 +40,9 @@ func (p *SwitchTimer) Process(ctx *ScriptContext) error {
 	ctx.Logger.Debugf("process switchtimer %s", p.Name)
 
 	if p.pin == nil {
-		pin, err := io.NewOutputPin(p.PinName)
+		pin, err := io.NewPin(p.Pin)
 		if err != nil && p.WarnOnPinError {
-			ctx.Logger.Warnf("create digital output pin %s: %v", p.PinName, err)
+			ctx.Logger.Warnf("create digital output pin %s: %v", p.Pin, err)
 		}
 
 		p.pin = pin
