@@ -16,10 +16,12 @@ create_bin_dir:
 generate: install_yaegi
 	go generate symbols/generate.go
 	
-.PHONY: build
-build: generate create_bin_dir
+.PHONY: build_amd64
+build_amd64: create_bin_dir
 	CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -o bin/sensor_amd64_linux -trimpath \
-	-ldflags "-s -w -X main.BuildCommit=$(GIT_COMMIT) -X main.BuildVersion=$(GIT_TAG) -X main.BuildDate=$(BUILD_DATE) -extldflags=-static" *.go
+	-ldflags "-s -w -X main.BuildCommit=$(GIT_COMMIT) -X main.BuildVersion=$(GIT_TAG) -X main.BuildDate=$(BUILD_DATE) -extldflags=-static" *.go	
+
+.PHONY: build_arm64
+build_arm64: create_bin_dir	
 	CGO_ENABLED=0 GOARCH=arm64 GOOS=linux go build -o bin/sensor_arm64_linux -trimpath \
 	-ldflags "-s -w -X main.BuildCommit=$(GIT_COMMIT) -X main.BuildVersion=$(GIT_TAG) -X main.BuildDate=$(BUILD_DATE) -extldflags=-static" *.go
-
