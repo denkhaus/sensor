@@ -7,3 +7,4 @@ package symbols
 //go:generate yaegi extract "github.com/pkg/errors"
 //go:generate yaegi extract "github.com/timshannon/badgerhold/v4"
 //go:generate yaegi extract "periph.io/x/host/v3/rpi"
+//go:generate yaegi extract "periph.io/x/conn/v3/gpio"
