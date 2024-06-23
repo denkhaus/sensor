@@ -3,7 +3,10 @@ module github.com/denkhaus/sensor
 go 1.22.1
 
 require (
+	github.com/SaidinWoT/timespan v0.0.0-20160403210742-a3d8e4741124
 	github.com/davecgh/go-spew v1.1.1
+	github.com/dgraph-io/badger/v4 v4.1.0
+	github.com/muesli/go-app-paths v0.2.2
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/traefik/yaegi v0.16.1
@@ -13,7 +16,6 @@ require (
 
 require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
-	github.com/dgraph-io/badger/v4 v4.1.0 // indirect
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
@@ -25,6 +27,7 @@ require (
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/iancoleman/strcase v0.3.0 // indirect
 	github.com/klauspost/compress v1.16.5 // indirect
+	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect

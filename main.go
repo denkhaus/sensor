@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/denkhaus/sensor/config"
 	"github.com/denkhaus/sensor/logging"
@@ -36,7 +37,7 @@ var (
 // - error: an error if the serial port could not be opened (error).
 func startup(config *config.Config) (serial.Port, error) {
 	// Check if inputPort is empty
-	if config.Port == "" {
+	if config.Usb.Port == "" {
 		return nil, errors.New("inputPort cannot be empty")
 	}
 
@@ -51,7 +52,7 @@ func startup(config *config.Config) (serial.Port, error) {
 
 	found := false
 	for _, port := range ports {
-		if port == config.Port {
+		if port == config.Usb.Port {
 			found = true
 			break
 		}
@@ -59,7 +60,7 @@ func startup(config *config.Config) (serial.Port, error) {
 
 	if !found {
 		logger.Infof("available ports: %v", ports)
-		return nil, errors.Errorf("the port %v you defined was not found", config.Port)
+		return nil, errors.Errorf("the port %v you defined was not found", config.Usb.Port)
 	}
 
 	mode := &serial.Mode{
@@ -69,10 +70,16 @@ func startup(config *config.Config) (serial.Port, error) {
 		StopBits: serial.OneStopBit,
 	}
 
-	logger.Infof("open port: %s", config.Port)
-	port, err := serial.Open(config.Port, mode)
+	logger.Infof("open port: %s", config.Usb.Port)
+	port, err := serial.Open(config.Usb.Port, mode)
 	if err != nil {
 		return nil, errors.Wrap(err, "open serial port failed")
+	}
+
+	if err = port.SetReadTimeout(
+		time.Duration(time.Second * time.Duration(config.Usb.ReadTimeout)),
+	); err != nil {
+		return nil, errors.Wrap(err, "set port read timeout")
 	}
 
 	return port, nil

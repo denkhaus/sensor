@@ -28,8 +28,14 @@ type EmbeddedStore interface {
 	Update(key string, v any) error
 	Upsert(key string, v any) error
 	Delete(key string, v any) error
+	Find(query *badgerhold.Query, result interface{}) error
+	FindOne(query *badgerhold.Query, result interface{}) error
 	Get(key string, v interface{}) error
 	MustGet(key string, v interface{}) bool
+}
+
+func IsDocumentNotFoundError(err error) bool {
+	return errors.Is(errors.Cause(err), badgerhold.ErrNotFound)
 }
 
 func NewEmbeddedStore(storageId string) EmbeddedStore {
@@ -38,6 +44,29 @@ func NewEmbeddedStore(storageId string) EmbeddedStore {
 	}
 }
 
+func (p *embeddedStore) Find(query *badgerhold.Query, result interface{}) error {
+	if p.database == nil {
+		return ErrDatabaseNotCreated
+	}
+
+	if err := p.database.Find(result, query); err != nil {
+		return errors.Wrap(err, "Find")
+	}
+
+	return nil
+}
+
+func (p *embeddedStore) FindOne(query *badgerhold.Query, result interface{}) error {
+	if p.database == nil {
+		return ErrDatabaseNotCreated
+	}
+
+	if err := p.database.FindOne(result, query); err != nil {
+		return errors.Wrap(err, "FindOne")
+	}
+
+	return nil
+}
 func (p *embeddedStore) Insert(key string, v any) error {
 	if p.database == nil {
 		return ErrDatabaseNotCreated
@@ -148,7 +177,7 @@ func (p *embeddedStore) dbName() string {
 }
 
 func (p *embeddedStore) dataPath(id string) (string, error) {
-	scope := gap.NewScope(gap.User, filepath.Join("tradesys", id))
+	scope := gap.NewScope(gap.User, filepath.Join("sensor", id))
 	dataPath, err := scope.DataPath("")
 	if err != nil {
 		return "", errors.Wrap(err, "DataPath")

@@ -4,25 +4,27 @@ package symbols
 
 import (
 	"github.com/denkhaus/sensor/store"
+	"github.com/timshannon/badgerhold/v4"
 	"reflect"
 )
 
 func init() {
 	Symbols["github.com/denkhaus/sensor/store/store"] = map[string]reflect.Value{
 		// function, constant and variable definitions
-		"Conductivity":          reflect.ValueOf(store.Conductivity),
-		"Embedded":              reflect.ValueOf(store.Embedded),
-		"ErrDatabaseNotCreated": reflect.ValueOf(&store.ErrDatabaseNotCreated).Elem(),
-		"Get":                   reflect.ValueOf(store.Get),
-		"Humidity":              reflect.ValueOf(store.Humidity),
-		"Initialize":            reflect.ValueOf(store.Initialize),
-		"NewEmbeddedStore":      reflect.ValueOf(store.NewEmbeddedStore),
-		"NewSensorStore":    	 reflect.ValueOf(store.NewSensorStore),
-		"Salinity":              reflect.ValueOf(store.Salinity),
-		"Sensor":                reflect.ValueOf(store.Sensor),
-		"Set":                   reflect.ValueOf(store.Set),
-		"TDS":                   reflect.ValueOf(store.TDS),
-		"Temperature":           reflect.ValueOf(store.Temperature),
+		"Conductivity":            reflect.ValueOf(store.Conductivity),
+		"Embedded":                reflect.ValueOf(store.Embedded),
+		"ErrDatabaseNotCreated":   reflect.ValueOf(&store.ErrDatabaseNotCreated).Elem(),
+		"Get":                     reflect.ValueOf(store.Get),
+		"Humidity":                reflect.ValueOf(store.Humidity),
+		"Initialize":              reflect.ValueOf(store.Initialize),
+		"IsDocumentNotFoundError": reflect.ValueOf(store.IsDocumentNotFoundError),
+		"NewEmbeddedStore":        reflect.ValueOf(store.NewEmbeddedStore),
+		"NewSensorStore":          reflect.ValueOf(store.NewSensorStore),
+		"Salinity":                reflect.ValueOf(store.Salinity),
+		"Sensor":                  reflect.ValueOf(store.Sensor),
+		"Set":                     reflect.ValueOf(store.Set),
+		"TDS":                     reflect.ValueOf(store.TDS),
+		"Temperature":             reflect.ValueOf(store.Temperature),
 
 		// type definitions
 		"DataID":        reflect.ValueOf((*store.DataID)(nil)),
@@ -40,6 +42,8 @@ type _github_com_denkhaus_sensor_store_EmbeddedStore struct {
 	IValue   interface{}
 	WClose   func() (err error)
 	WDelete  func(key string, v any) error
+	WFind    func(query *badgerhold.Query, result interface{}) error
+	WFindOne func(query *badgerhold.Query, result interface{}) error
 	WGet     func(key string, v interface{}) error
 	WInsert  func(key string, v any) error
 	WMustGet func(key string, v interface{}) bool
@@ -53,6 +57,12 @@ func (W _github_com_denkhaus_sensor_store_EmbeddedStore) Close() (err error) {
 }
 func (W _github_com_denkhaus_sensor_store_EmbeddedStore) Delete(key string, v any) error {
 	return W.WDelete(key, v)
+}
+func (W _github_com_denkhaus_sensor_store_EmbeddedStore) Find(query *badgerhold.Query, result interface{}) error {
+	return W.WFind(query, result)
+}
+func (W _github_com_denkhaus_sensor_store_EmbeddedStore) FindOne(query *badgerhold.Query, result interface{}) error {
+	return W.WFindOne(query, result)
 }
 func (W _github_com_denkhaus_sensor_store_EmbeddedStore) Get(key string, v interface{}) error {
 	return W.WGet(key, v)

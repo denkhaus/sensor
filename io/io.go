@@ -17,14 +17,7 @@ const (
 	PinStateHigh
 )
 
-type Operator struct {
-}
-
-func NewIOOperator() *Operator {
-	return &Operator{}
-}
-
-func (p *Operator) Close() {
+func CloseAll() {
 	hwio.CloseAll()
 }
 
@@ -75,8 +68,18 @@ func (p *Pin) SetLow() error {
 	return nil
 }
 
-func (p *Pin) PulseHigh(dur time.Duration) error {
-	return hwio.DigitalWrite(p.Pin, hwio.LOW)
+func (p *Pin) Pulse(dur time.Duration) error {
+	if err := p.SetHigh(); err != nil {
+		return err
+	}
+
+	time.Sleep(dur)
+
+	if err := p.SetLow(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (p *Pin) Close() error {
@@ -92,7 +95,7 @@ func (p *Pin) GetState() (PinState, error) {
 	return PinState(state), nil
 }
 
-func (p *Operator) NewOutputPin(name string) (*Pin, error) {
+func NewOutputPin(name string) (*Pin, error) {
 	pin, err := hwio.GetPin(name)
 	if err != nil {
 		return nil, errors.Wrapf(err, "create pin %s", name)
@@ -105,7 +108,7 @@ func (p *Operator) NewOutputPin(name string) (*Pin, error) {
 	return &Pin{Pin: pin, name: name}, nil
 }
 
-func (p *Operator) NewInputPin(name string) (*Pin, error) {
+func NewInputPin(name string) (*Pin, error) {
 	pin, err := hwio.GetPin(name)
 	if err != nil {
 		return nil, errors.Wrapf(err, "create pin %s", name)

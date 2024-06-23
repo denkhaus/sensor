@@ -118,7 +118,14 @@ func (p *DataReader) process(
 					logger.Info("data-reader: done received -> closing")
 					return nil
 				default:
-					comChan <- SensorData{id: dataID, data: rec}
+					data := SensorData{id: dataID, data: rec}
+					// decode data here to ensure, data is written to the store
+					data.Decode()
+					if len(comChan) == ChannelSize {
+						logger.Warn("sensor data channel is full, dropping data")
+					} else {
+						comChan <- data
+					}
 				}
 			}
 		}
@@ -133,7 +140,6 @@ func (p *DataReader) process(
 
 		client := mqtt.NewClient(opts)
 		if token := client.Connect(); token.Wait() && token.Error() != nil {
-			close(comChan)
 			return errors.Wrap(token.Error(), "mqtt connect error")
 		}
 
@@ -144,11 +150,10 @@ func (p *DataReader) process(
 			token := client.Publish(topic, byte(qos), false, val)
 
 			if token.Wait() && token.Error() != nil {
-				close(comChan)
 				return errors.Wrapf(token.Error(), "mqtt publish error for topic %s", topic)
 			}
 
-			logger.Infof("mqtt:sent->%s: %v", topic, val)
+			logger.Debugf("mqtt:sent->%s: %v", topic, val)
 		}
 
 		logger.Info("mqtt-writer: channel closed -> closing")

@@ -10,12 +10,13 @@ import (
 func init() {
 	Symbols["github.com/denkhaus/sensor/io/io"] = map[string]reflect.Value{
 		// function, constant and variable definitions
-		"NewIOOperator": reflect.ValueOf(io.NewIOOperator),
-		"PinStateHigh":  reflect.ValueOf(io.PinStateHigh),
-		"PinStateLow":   reflect.ValueOf(io.PinStateLow),
+		"CloseAll":     reflect.ValueOf(io.CloseAll),
+		"NewInputPin":  reflect.ValueOf(io.NewInputPin),
+		"NewOutputPin": reflect.ValueOf(io.NewOutputPin),
+		"PinStateHigh": reflect.ValueOf(io.PinStateHigh),
+		"PinStateLow":  reflect.ValueOf(io.PinStateLow),
 
 		// type definitions
-		"Operator": reflect.ValueOf((*io.Operator)(nil)),
 		"Pin":      reflect.ValueOf((*io.Pin)(nil)),
 		"PinState": reflect.ValueOf((*io.PinState)(nil)),
 	}

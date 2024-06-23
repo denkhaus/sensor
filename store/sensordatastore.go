@@ -1,5 +1,7 @@
 package store
 
+import "sync"
+
 //go:generate stringer -type=DataID
 
 type DataID int
@@ -18,14 +20,19 @@ type SensorStore interface {
 }
 
 type sensorStore struct {
-	data map[DataID]float64
+	mutex sync.RWMutex
+	data  map[DataID]float64
 }
 
 func (p *sensorStore) Set(id DataID, data float64) {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
 	p.data[id] = data
 }
 
 func (p *sensorStore) Get(id DataID) float64 {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
 	return p.data[id]
 }
 
