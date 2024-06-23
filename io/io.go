@@ -1,19 +1,13 @@
 package io
 
 import (
-	"encoding/gob"
 	"time"
 
 	"github.com/pkg/errors"
 	"periph.io/x/conn/v3/gpio"
-	"periph.io/x/host/v3/bcm283x"
 )
 
 //go:generate stringer -type=PinState
-
-func init() {
-	gob.Register(bcm283x.Pin{})
-}
 
 type Pin struct {
 	gpio.PinIO

@@ -14,7 +14,6 @@ func init() {
 
 type PulseTimer struct {
 	Name              string
-	Pin               gpio.PinIO
 	Description       string
 	CurrentSpan       Span
 	PulseDuration     time.Duration
@@ -27,10 +26,10 @@ func (p *PulseTimer) Write(ctx *ScriptContext) error {
 	return ctx.EmbeddedStore.Upsert(p.Name, p)
 }
 
-func (p *PulseTimer) pulse(ctx *ScriptContext, fnCondition func() bool) error {
-	pin, err := io.NewPin(p.Pin)
+func (p *PulseTimer) pulse(ctx *ScriptContext, fnCondition func() bool, pinio gpio.PinIO) error {
+	pin, err := io.NewPin(pinio)
 	if err != nil && p.WarnOnPinError {
-		ctx.Logger.Warnf("open digital output pin %s: %v", p.Pin, err)
+		ctx.Logger.Warnf("open digital output pin %s: %v", pinio, err)
 	}
 
 	defer func() {
@@ -54,13 +53,13 @@ func (p *PulseTimer) pulse(ctx *ScriptContext, fnCondition func() bool) error {
 	return p.Write(ctx)
 }
 
-func (p *PulseTimer) Process(ctx *ScriptContext, fnCondition func() bool) error {
+func (p *PulseTimer) Process(ctx *ScriptContext, fnCondition func() bool, pinio gpio.PinIO) error {
 	ctx.Logger.Debugf("process pulsetimer %s", p.Name)
 
 	if p.CurrentSpan.IsZero() {
 		ctx.Logger.Infof("initialize pulsetimer %s", p.Name)
 		if p.PulseOnInitialize {
-			if err := p.pulse(ctx, fnCondition); err != nil {
+			if err := p.pulse(ctx, fnCondition, pinio); err != nil {
 				return err
 			}
 		} else {
@@ -74,7 +73,7 @@ func (p *PulseTimer) Process(ctx *ScriptContext, fnCondition func() bool) error 
 		return nil
 	}
 
-	if err := p.pulse(ctx, fnCondition); err != nil {
+	if err := p.pulse(ctx, fnCondition, pinio); err != nil {
 		return err
 	}
 

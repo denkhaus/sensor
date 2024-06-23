@@ -6,6 +6,7 @@ import (
 	"github.com/denkhaus/sensor/store"
 	"github.com/denkhaus/sensor/types"
 	"github.com/pkg/errors"
+	"periph.io/x/conn/v3/gpio"
 	"periph.io/x/host/v3/rpi"
 )
 
@@ -29,20 +30,20 @@ func readDosePumpState(ctx *types.ScriptContext, dosePumpStateID string) (*types
 	return &pumpState, err
 }
 
-func processAquaPump(ctx *types.ScriptContext, pumpStateID string) error {
+func processAquaPump(ctx *types.ScriptContext, pumpStateID string, pinio gpio.PinIO) error {
 	ps, err := readAquaPumpState(ctx, pumpStateID)
 	if err != nil {
 		return errors.Wrapf(err, "readAquaPumpState %s", pumpStateID)
 	}
 
-	if err := ps.Process(ctx); err != nil {
+	if err := ps.Process(ctx, pinio); err != nil {
 		return errors.Wrapf(err, "process aqua pump %s", pumpStateID)
 	}
 
 	return nil
 }
 
-func processDosePump(ctx *types.ScriptContext, pumpStateID string) error {
+func processDosePump(ctx *types.ScriptContext, pumpStateID string, pinio gpio.PinIO) error {
 	ps, err := readDosePumpState(ctx, pumpStateID)
 	if err != nil {
 		return errors.Wrapf(err, "readDosePumpState %s", pumpStateID)
@@ -58,7 +59,7 @@ func processDosePump(ctx *types.ScriptContext, pumpStateID string) error {
 		return false
 	}
 
-	if err := ps.Process(ctx, fnCondition); err != nil {
+	if err := ps.Process(ctx, fnCondition, pinio); err != nil {
 		return errors.Wrapf(err, "process dose pump %s", pumpStateID)
 	}
 
@@ -71,7 +72,6 @@ func setup(ctx *types.ScriptContext) error {
 		ctx.Logger.Infof("setup pumpstatus %s", DosePumpStateIDDefault)
 
 		status1 := types.PulseTimer{
-			Pin:               rpi.P1_35,
 			Name:              DosePumpStateIDDefault,
 			PulseOnInitialize: true,
 			WarnOnPinError:    false,
@@ -90,7 +90,6 @@ func setup(ctx *types.ScriptContext) error {
 		ctx.Logger.Infof("setup pumpstatus %s", AquaPumpStateIDGreenhouse)
 
 		status1 := types.SwitchTimer{
-			Pin:            rpi.P1_32,
 			Name:           AquaPumpStateIDGreenhouse,
 			Description:    "The greenhouse pump status",
 			WarnOnPinError: false,
@@ -109,7 +108,6 @@ func setup(ctx *types.ScriptContext) error {
 		ctx.Logger.Infof("setup pumpstatus %s", AquaPumpStateIDHydroRack)
 
 		status2 := types.SwitchTimer{
-			Pin:            rpi.P1_38,
 			Name:           AquaPumpStateIDHydroRack,
 			Description:    "The hydrorack pump status",
 			WarnOnPinError: false,
@@ -135,15 +133,15 @@ func Script(ctx *types.ScriptContext) error {
 	hum := ctx.SensorStore.Get(store.Humidity)
 	ctx.Logger.Infof("EC: %f, Humidity: %f, ", cond, hum)
 
-	if err := processAquaPump(ctx, AquaPumpStateIDGreenhouse); err != nil {
+	if err := processAquaPump(ctx, AquaPumpStateIDGreenhouse, rpi.P1_38); err != nil {
 		return err
 	}
 
-	if err := processAquaPump(ctx, AquaPumpStateIDHydroRack); err != nil {
+	if err := processAquaPump(ctx, AquaPumpStateIDHydroRack, rpi.P1_32); err != nil {
 		return err
 	}
 
-	if err := processDosePump(ctx, DosePumpStateIDDefault); err != nil {
+	if err := processDosePump(ctx, DosePumpStateIDDefault, rpi.P1_35); err != nil {
 		return err
 	}
 

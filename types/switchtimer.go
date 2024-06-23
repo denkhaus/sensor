@@ -22,7 +22,6 @@ const (
 
 type SwitchTimer struct {
 	Name           string
-	Pin            gpio.PinIO
 	Description    string
 	CurrentSpan    Span
 	CurrentState   SwitchTimerState
@@ -36,13 +35,13 @@ func (p *SwitchTimer) Write(ctx *ScriptContext) error {
 	return ctx.EmbeddedStore.Upsert(p.Name, p)
 }
 
-func (p *SwitchTimer) Process(ctx *ScriptContext) error {
+func (p *SwitchTimer) Process(ctx *ScriptContext, pin gpio.PinIO) error {
 	ctx.Logger.Debugf("process switchtimer %s", p.Name)
 
 	if p.pin == nil {
-		pin, err := io.NewPin(p.Pin)
+		pin, err := io.NewPin(pin)
 		if err != nil && p.WarnOnPinError {
-			ctx.Logger.Warnf("create digital output pin %s: %v", p.Pin, err)
+			ctx.Logger.Warnf("create digital output pin %s: %v", pin, err)
 		}
 
 		p.pin = pin
