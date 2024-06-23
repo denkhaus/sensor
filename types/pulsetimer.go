@@ -19,7 +19,7 @@ type PulseTimer struct {
 	PulseDuration     time.Duration
 	WaitDuration      time.Duration
 	PulseOnInitialize bool
-	WarnOnPinError    bool
+	Inverted          bool
 }
 
 func (p *PulseTimer) Write(ctx *ScriptContext) error {
@@ -27,14 +27,10 @@ func (p *PulseTimer) Write(ctx *ScriptContext) error {
 }
 
 func (p *PulseTimer) pulse(ctx *ScriptContext, fnCondition func() bool, pinio gpio.PinIO) error {
-	pin, err := io.NewPin(pinio)
-	if err != nil && p.WarnOnPinError {
-		ctx.Logger.Warnf("open digital output pin %s: %v", pinio, err)
-	}
+	pin := io.NewPin(pinio)
 
 	defer func() {
 		if pin != nil {
-			pin.SetLow()
 			pin.Close()
 		}
 	}()
@@ -42,7 +38,11 @@ func (p *PulseTimer) pulse(ctx *ScriptContext, fnCondition func() bool, pinio gp
 	if fnCondition() {
 		ctx.Logger.Infof("pulsetimer %s: pulse for %s", p.Name, p.PulseDuration)
 		if pin != nil {
-			pin.Pulse(p.PulseDuration)
+			if p.Inverted {
+				pin.PulseLow(p.PulseDuration)
+			} else {
+				pin.PulseHigh(p.PulseDuration)
+			}
 		}
 	} else {
 		ctx.Logger.Infof("pulsetimer %s: condition not met. try again in %s", p.Name, p.WaitDuration)

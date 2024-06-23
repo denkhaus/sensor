@@ -21,14 +21,14 @@ const (
 )
 
 type SwitchTimer struct {
-	Name           string
-	Description    string
-	CurrentSpan    Span
-	CurrentState   SwitchTimerState
-	OnDuration     time.Duration
-	OffDuration    time.Duration
-	WarnOnPinError bool
-	pin            *io.Pin
+	Name         string
+	Description  string
+	CurrentSpan  Span
+	CurrentState SwitchTimerState
+	OnDuration   time.Duration
+	OffDuration  time.Duration
+	Inverted     bool
+	pin          *io.Pin
 }
 
 func (p *SwitchTimer) Write(ctx *ScriptContext) error {
@@ -39,12 +39,7 @@ func (p *SwitchTimer) Process(ctx *ScriptContext, pin gpio.PinIO) error {
 	ctx.Logger.Debugf("process switchtimer %s", p.Name)
 
 	if p.pin == nil {
-		pin, err := io.NewPin(pin)
-		if err != nil && p.WarnOnPinError {
-			ctx.Logger.Warnf("create digital output pin %s: %v", pin, err)
-		}
-
-		p.pin = pin
+		p.pin = io.NewPin(pin)
 	}
 
 	if p.CurrentState == SwitchTimerStateInitialized {
@@ -52,7 +47,12 @@ func (p *SwitchTimer) Process(ctx *ScriptContext, pin gpio.PinIO) error {
 		p.CurrentSpan = NewTimespan(time.Now(), p.OffDuration)
 
 		if p.pin != nil {
-			p.pin.SetLow()
+			if p.Inverted {
+				p.pin.SetHigh()
+			} else {
+				p.pin.SetLow()
+			}
+
 		}
 
 		ctx.Logger.Infof("switchtimer %s turned off", p.Name)
@@ -67,7 +67,12 @@ func (p *SwitchTimer) Process(ctx *ScriptContext, pin gpio.PinIO) error {
 		p.CurrentSpan = NewTimespan(time.Now(), p.OnDuration)
 
 		if p.pin != nil {
-			p.pin.SetHigh()
+			if p.Inverted {
+				p.pin.SetLow()
+			} else {
+				p.pin.SetHigh()
+			}
+
 		}
 
 		ctx.Logger.Infof("switchtimer %s turned on", p.Name)
@@ -82,7 +87,11 @@ func (p *SwitchTimer) Process(ctx *ScriptContext, pin gpio.PinIO) error {
 		p.CurrentSpan = NewTimespan(time.Now(), p.OffDuration)
 
 		if p.pin != nil {
-			p.pin.SetLow()
+			if p.Inverted {
+				p.pin.SetHigh()
+			} else {
+				p.pin.SetLow()
+			}
 		}
 
 		ctx.Logger.Infof("switchtimer %s turned off", p.Name)

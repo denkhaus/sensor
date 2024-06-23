@@ -49,7 +49,7 @@ func (p *Pin) SetLow() error {
 	return p.SetState(gpio.Low)
 }
 
-func (p *Pin) Pulse(dur time.Duration) error {
+func (p *Pin) PulseHigh(dur time.Duration) error {
 	if err := p.SetHigh(); err != nil {
 		return err
 	}
@@ -57,6 +57,19 @@ func (p *Pin) Pulse(dur time.Duration) error {
 	time.Sleep(dur)
 
 	if err := p.SetLow(); err != nil {
+		return err
+	}
+
+	return nil
+}
+func (p *Pin) PulseLow(dur time.Duration) error {
+	if err := p.SetLow(); err != nil {
+		return err
+	}
+
+	time.Sleep(dur)
+
+	if err := p.SetHigh(); err != nil {
 		return err
 	}
 
@@ -71,6 +84,6 @@ func (p *Pin) GetState() gpio.Level {
 	return p.PinIO.Read()
 }
 
-func NewPin(pin gpio.PinIO) (*Pin, error) {
-	return &Pin{PinIO: pin}, nil
+func NewPin(pin gpio.PinIO) *Pin {
+	return &Pin{PinIO: pin}
 }

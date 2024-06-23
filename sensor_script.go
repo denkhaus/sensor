@@ -74,7 +74,7 @@ func setup(ctx *types.ScriptContext) error {
 		status1 := types.PulseTimer{
 			Name:              DosePumpStateIDDefault,
 			PulseOnInitialize: true,
-			WarnOnPinError:    false,
+			Inverted:          true,
 			Description:       "The dose pump status",
 			PulseDuration:     time.Second * 2,
 			WaitDuration:      time.Minute * 2,
@@ -90,12 +90,12 @@ func setup(ctx *types.ScriptContext) error {
 		ctx.Logger.Infof("setup pumpstatus %s", AquaPumpStateIDGreenhouse)
 
 		status1 := types.SwitchTimer{
-			Name:           AquaPumpStateIDGreenhouse,
-			Description:    "The greenhouse pump status",
-			WarnOnPinError: false,
-			CurrentState:   types.SwitchTimerStateInitialized,
-			OnDuration:     time.Second * 3,
-			OffDuration:    time.Second * 60,
+			Name:         AquaPumpStateIDGreenhouse,
+			Description:  "The greenhouse pump status",
+			Inverted:     true,
+			CurrentState: types.SwitchTimerStateInitialized,
+			OnDuration:   time.Second * 3,
+			OffDuration:  time.Second * 60,
 		}
 
 		if err := ctx.EmbeddedStore.Upsert(status1.Name, status1); err != nil {
@@ -108,12 +108,12 @@ func setup(ctx *types.ScriptContext) error {
 		ctx.Logger.Infof("setup pumpstatus %s", AquaPumpStateIDHydroRack)
 
 		status2 := types.SwitchTimer{
-			Name:           AquaPumpStateIDHydroRack,
-			Description:    "The hydrorack pump status",
-			WarnOnPinError: false,
-			CurrentState:   types.SwitchTimerStateInitialized,
-			OnDuration:     time.Second * 10,
-			OffDuration:    time.Second * 20,
+			Name:         AquaPumpStateIDHydroRack,
+			Description:  "The hydrorack pump status",
+			Inverted:     true,
+			CurrentState: types.SwitchTimerStateInitialized,
+			OnDuration:   time.Second * 10,
+			OffDuration:  time.Second * 20,
 		}
 
 		if err := ctx.EmbeddedStore.Upsert(status2.Name, status2); err != nil {
