@@ -25,3 +25,6 @@ build_amd64: create_bin_dir
 build_arm64: create_bin_dir	
 	CGO_ENABLED=0 GOARCH=arm64 GOOS=linux go build -o bin/sensor_arm64_linux -trimpath \
 	-ldflags "-s -w -X main.BuildCommit=$(GIT_COMMIT) -X main.BuildVersion=$(GIT_TAG) -X main.BuildDate=$(BUILD_DATE) -extldflags=-static" *.go
+
+reset_database:
+	rm -r /home/denkhaus/.local/share/sensor
