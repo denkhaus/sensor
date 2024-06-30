@@ -75,8 +75,8 @@ func Setup(ctx *types.ScriptContext) error {
 		PulseOnInitialize: true,
 		Inverted:          true,
 		Description:       "The dose pump status",
-		PulseDuration:     time.Second * 1,
-		WaitDuration:      time.Minute * 60,
+		PulseDuration:     time.Second * 2,
+		WaitDuration:      time.Minute * 30,
 	}
 
 	if err := ctx.EmbeddedStore.Upsert(status1.Name, status1); err != nil {
