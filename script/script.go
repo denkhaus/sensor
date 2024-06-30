@@ -69,7 +69,7 @@ func NewScriptRunner(scriptContent string, gopath string) (*ScriptRunner, error)
 	}, nil
 }
 
-func (s *ScriptRunner) Run() error {
+func (s *ScriptRunner) CallScript() error {
 	in := []reflect.Value{
 		reflect.ValueOf(s.scriptContext),
 	}
@@ -83,7 +83,7 @@ func (s *ScriptRunner) Run() error {
 	return nil
 }
 
-func (s *ScriptRunner) Setup() error {
+func (s *ScriptRunner) CallSetup() error {
 	in := []reflect.Value{
 		reflect.ValueOf(s.scriptContext),
 	}
@@ -126,9 +126,13 @@ func Initialize(ctx context.Context, logger *logrus.Logger, config *config.Confi
 	durRunInterval := time.Second * time.Duration(config.Script.RunInterval)
 
 	eg.Go(func() error {
+		if err := runner.CallSetup(); err != nil {
+			return errors.Wrap(err, "CallSetup")
+		}
+
 		for {
-			if err := runner.Run(); err != nil {
-				return errors.Wrap(err, "execute script")
+			if err := runner.CallScript(); err != nil {
+				return errors.Wrap(err, "CallScript")
 			}
 
 			select {
