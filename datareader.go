@@ -145,8 +145,8 @@ func (p *DataReader) process(
 
 		qos := 0
 		for sensorData := range comChan {
-			topic := fmt.Sprintf("%s/%s/%s", config.Mqtt.TopicPrefix, config.Mqtt.ClientID, sensorData.id)
-			val := sensorData.Decode()
+			topic := fmt.Sprintf("%s/%s/SENSOR", config.Mqtt.TopicPrefix, config.Mqtt.ClientID)
+			val := sensorData.Payload()
 			token := client.Publish(topic, byte(qos), false, val)
 
 			if token.Wait() && token.Error() != nil {
