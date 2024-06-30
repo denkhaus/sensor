@@ -28,3 +28,8 @@ build_arm64: create_bin_dir
 
 reset_database:
 	rm -r /home/denkhaus/.local/share/sensor
+
+restart_service:
+	@sudo systemctl stop sensor.service
+	-@rm -r /home/denkhaus/.local/share/sensor
+	@sudo systemctl start sensor.service
