@@ -76,8 +76,8 @@ func setup(ctx *types.ScriptContext) error {
 			PulseOnInitialize: true,
 			Inverted:          true,
 			Description:       "The dose pump status",
-			PulseDuration:     time.Second * 2,
-			WaitDuration:      time.Minute * 30,
+			PulseDuration:     time.Second * 1,
+			WaitDuration:      time.Minute * 60,
 		}
 
 		if err := ctx.EmbeddedStore.Upsert(status1.Name, status1); err != nil {
@@ -94,8 +94,8 @@ func setup(ctx *types.ScriptContext) error {
 			Description:  "The greenhouse pump status",
 			Inverted:     true,
 			CurrentState: types.SwitchTimerStateInitialized,
-			OnDuration:   time.Second * 3,
-			OffDuration:  time.Second * 60,
+			OnDuration:   time.Second * 2,
+			OffDuration:  time.Minute * 3,
 		}
 
 		if err := ctx.EmbeddedStore.Upsert(status1.Name, status1); err != nil {
