@@ -9,8 +9,8 @@ import (
 type Config struct {
 	Version bool `usage:"show version and exit" env:""`
 	Usb     struct {
-		ReadTimeout int    `default:"10" usage:"read timeout  for input port in seconds"`
-		Port        string `default:"/dev/ttyUSB0" usage:"serial port to read from"`
+		ReadTimeout int    `default:"20" usage:"read timeout  for input port in seconds"`
+		Port        string `default:"/dev/ttyUSB0" usage:"serial port name to read from, or 'auto' to choose the first available port"`
 	}
 
 	LogLevel       string `default:"info" usage:"log level"`

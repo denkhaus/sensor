@@ -38,7 +38,7 @@ var (
 func startup(config *config.Config) (serial.Port, error) {
 	// Check if inputPort is empty
 	if config.Usb.Port == "" {
-		return nil, errors.New("inputPort cannot be empty")
+		return nil, errors.New("usb inputPort cannot be empty")
 	}
 
 	ports, err := serial.GetPortsList()
@@ -58,7 +58,7 @@ func startup(config *config.Config) (serial.Port, error) {
 		}
 	}
 
-	if !found {
+	if config.Usb.Port != "auto" && !found {
 		logger.Infof("available ports: %v", ports)
 		return nil, errors.Errorf("the port %v you defined was not found", config.Usb.Port)
 	}
@@ -70,8 +70,14 @@ func startup(config *config.Config) (serial.Port, error) {
 		StopBits: serial.OneStopBit,
 	}
 
-	logger.Infof("open port: %s", config.Usb.Port)
-	port, err := serial.Open(config.Usb.Port, mode)
+	usbInputPort := config.Usb.Port
+	if usbInputPort == "auto" {
+		usbInputPort = ports[0]
+		logger.Infof("-usb-port was set to auto -> choose : %v", usbInputPort)
+	}
+
+	logger.Infof("open port: %s", usbInputPort)
+	port, err := serial.Open(usbInputPort, mode)
 	if err != nil {
 		return nil, errors.Wrap(err, "open serial port failed")
 	}
