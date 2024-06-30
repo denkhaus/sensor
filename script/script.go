@@ -24,6 +24,7 @@ type EntrypointFunc func(ctx *types.ScriptContext) error
 type ScriptRunner struct {
 	i             *interp.Interpreter
 	scriptFunc    reflect.Value
+	setupFunc     reflect.Value
 	scriptContext *types.ScriptContext
 	content       string
 }
@@ -48,6 +49,11 @@ func NewScriptRunner(scriptContent string, gopath string) (*ScriptRunner, error)
 		return nil, errors.Wrap(err, "find script entrypoint")
 	}
 
+	setupFunc, err := i.Eval(`main.Setup`)
+	if err != nil {
+		return nil, errors.Wrap(err, "find setup entrypoint")
+	}
+
 	scriptContext := &types.ScriptContext{
 		Logger:        logging.Logger(),
 		SensorStore:   store.Sensor(),
@@ -58,6 +64,7 @@ func NewScriptRunner(scriptContent string, gopath string) (*ScriptRunner, error)
 		i:             i,
 		content:       scriptContent,
 		scriptFunc:    scriptFunc,
+		setupFunc:     setupFunc,
 		scriptContext: scriptContext,
 	}, nil
 }
@@ -70,7 +77,21 @@ func (s *ScriptRunner) Run() error {
 	out := s.scriptFunc.Call(in)
 	if e := out[0].Interface(); e != nil {
 		err := e.(error)
-		return errors.Wrap(err, "execute entrypoint")
+		return errors.Wrap(err, "execute script entrypoint")
+	}
+
+	return nil
+}
+
+func (s *ScriptRunner) Setup() error {
+	in := []reflect.Value{
+		reflect.ValueOf(s.scriptContext),
+	}
+
+	out := s.setupFunc.Call(in)
+	if e := out[0].Interface(); e != nil {
+		err := e.(error)
+		return errors.Wrap(err, "execute setup entrypoint")
 	}
 
 	return nil

@@ -66,69 +66,57 @@ func processDosePump(ctx *types.ScriptContext, pumpStateID string, pinio gpio.Pi
 	return nil
 }
 
-func setup(ctx *types.ScriptContext) error {
-	_, err := readDosePumpState(ctx, DosePumpStateIDDefault)
-	if store.IsDocumentNotFoundError(err) {
-		ctx.Logger.Infof("setup pumpstatus %s", DosePumpStateIDDefault)
+func Setup(ctx *types.ScriptContext) error {
 
-		status1 := types.PulseTimer{
-			Name:              DosePumpStateIDDefault,
-			PulseOnInitialize: true,
-			Inverted:          true,
-			Description:       "The dose pump status",
-			PulseDuration:     time.Second * 1,
-			WaitDuration:      time.Minute * 60,
-		}
+	ctx.Logger.Infof("setup pumpstatus %s", DosePumpStateIDDefault)
 
-		if err := ctx.EmbeddedStore.Upsert(status1.Name, status1); err != nil {
-			return errors.Wrapf(err, "upsert pumpstatus %s", status1.Name)
-		}
+	status1 := types.PulseTimer{
+		Name:              DosePumpStateIDDefault,
+		PulseOnInitialize: true,
+		Inverted:          true,
+		Description:       "The dose pump status",
+		PulseDuration:     time.Second * 1,
+		WaitDuration:      time.Minute * 60,
 	}
 
-	_, err = readAquaPumpState(ctx, AquaPumpStateIDGreenhouse)
-	if store.IsDocumentNotFoundError(err) {
-		ctx.Logger.Infof("setup pumpstatus %s", AquaPumpStateIDGreenhouse)
-
-		status1 := types.SwitchTimer{
-			Name:         AquaPumpStateIDGreenhouse,
-			Description:  "The greenhouse pump status",
-			Inverted:     true,
-			CurrentState: types.SwitchTimerStateInitialized,
-			OnDuration:   time.Second * 2,
-			OffDuration:  time.Minute * 3,
-		}
-
-		if err := ctx.EmbeddedStore.Upsert(status1.Name, status1); err != nil {
-			return errors.Wrapf(err, "upsert pumpstatus %s", status1.Name)
-		}
+	if err := ctx.EmbeddedStore.Upsert(status1.Name, status1); err != nil {
+		return errors.Wrapf(err, "upsert pumpstatus %s", status1.Name)
 	}
 
-	_, err = readAquaPumpState(ctx, AquaPumpStateIDHydroRack)
-	if store.IsDocumentNotFoundError(err) {
-		ctx.Logger.Infof("setup pumpstatus %s", AquaPumpStateIDHydroRack)
+	ctx.Logger.Infof("setup pumpstatus %s", AquaPumpStateIDGreenhouse)
 
-		status2 := types.SwitchTimer{
-			Name:         AquaPumpStateIDHydroRack,
-			Description:  "The hydrorack pump status",
-			Inverted:     true,
-			CurrentState: types.SwitchTimerStateInitialized,
-			OnDuration:   time.Second * 10,
-			OffDuration:  time.Second * 20,
-		}
+	status2 := types.SwitchTimer{
+		Name:         AquaPumpStateIDGreenhouse,
+		Description:  "The greenhouse pump status",
+		Inverted:     true,
+		CurrentState: types.SwitchTimerStateInitialized,
+		OnDuration:   time.Second * 2,
+		OffDuration:  time.Minute * 3,
+	}
 
-		if err := ctx.EmbeddedStore.Upsert(status2.Name, status2); err != nil {
-			return errors.Wrapf(err, "upsert pumpstatus %s", status2.Name)
-		}
+	if err := ctx.EmbeddedStore.Upsert(status2.Name, status2); err != nil {
+		return errors.Wrapf(err, "upsert pumpstatus %s", status2.Name)
+	}
+
+	ctx.Logger.Infof("setup pumpstatus %s", AquaPumpStateIDHydroRack)
+
+	status3 := types.SwitchTimer{
+		Name:         AquaPumpStateIDHydroRack,
+		Description:  "The hydrorack pump status",
+		Inverted:     true,
+		CurrentState: types.SwitchTimerStateInitialized,
+		OnDuration:   time.Second * 10,
+		OffDuration:  time.Second * 20,
+	}
+
+	if err := ctx.EmbeddedStore.Upsert(status3.Name, status3); err != nil {
+		return errors.Wrapf(err, "upsert pumpstatus %s", status3.Name)
 	}
 
 	return nil
 }
 
 func Script(ctx *types.ScriptContext) error {
-	if err := setup(ctx); err != nil {
-		return errors.Wrap(err, "setup")
-	}
-
 	cond := ctx.SensorStore.Get(store.Conductivity)
 	hum := ctx.SensorStore.Get(store.Humidity)
 	ctx.Logger.Infof("EC: %f, Humidity: %f, ", cond, hum)
