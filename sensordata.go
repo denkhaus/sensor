@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/binary"
+	"encoding/json"
 	"strconv"
 
 	"github.com/denkhaus/sensor/store"
@@ -45,16 +46,16 @@ func (s *SensorData) Decode() string {
 	return strconv.FormatFloat(decodedValue, 'f', 2, 64)
 }
 
-func (s *SensorData) Payload() interface{} {
-	data := map[string]float64{
-		"humidity":     store.Get(store.Humidity),
-		"temperature":  store.Get(store.Temperature),
-		"conductivity": store.Get(store.Conductivity),
-		"salinity":     store.Get(store.Salinity),
-		"tds":          store.Get(store.TDS),
+func (s *SensorData) Payload() ([]byte, error) {
+	data := map[string]interface{}{
+		"data": map[string]float64{
+			"humidity":     store.Get(store.Humidity),
+			"temperature":  store.Get(store.Temperature),
+			"conductivity": store.Get(store.Conductivity),
+			"salinity":     store.Get(store.Salinity),
+			"tds":          store.Get(store.TDS),
+		},
 	}
 
-	return map[string]interface{}{
-		"data": data,
-	}
+	return json.Marshal(data)
 }
