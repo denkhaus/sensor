@@ -15,7 +15,7 @@ var (
 )
 
 func init() {
-	sensorStoreInstance = NewSensorStore()
+	sensorStoreInstance = NewSensorStore(100)
 }
 
 func Sensor() SensorStore {
