@@ -12,7 +12,7 @@ import (
 
 const (
 	ECMinThreshold            = 0.4
-	ECMaxThreshold            = 1.7
+	ECMaxThreshold            = 1.55
 	AquaPumpStateIDGreenhouse = "AquaPumpGreenhouse"
 	AquaPumpStateIDHydroRack  = "AquaPumpHydroRack"
 	DosePumpStateIDDefault    = "DosePumpDefault"
