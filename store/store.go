@@ -34,7 +34,13 @@ func Get(id DataID) float64 {
 	return sensorStoreInstance.Get(id)
 }
 
-func Initialize(ctx context.Context, logger *logrus.Logger, config *config.Config, eg *errgroup.Group) (EmbeddedStore, error) {
+func Initialize(
+	ctx context.Context,
+	logger *logrus.Logger,
+	config *config.Config,
+	eg *errgroup.Group,
+) (EmbeddedStore, error) {
+
 	storage := NewEmbeddedStore(config.Storage.Id)
 	if err := storage.Open(); err != nil {
 		return nil, errors.Wrap(err, "open storage")

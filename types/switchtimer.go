@@ -31,10 +31,21 @@ type SwitchTimer struct {
 	pin          *io.Pin
 }
 
+// Write writes the SwitchTimer to the embedded store in the given ScriptContext.
+//
+// Parameters:
+// - ctx: A pointer to a ScriptContext object representing the context in which the write operation is being performed.
+//
+// Returns:
+// - An error object if there was an error during the write operation, otherwise nil.
 func (p *SwitchTimer) Write(ctx *ScriptContext) error {
 	return ctx.EmbeddedStore.Upsert(p.Name, p)
 }
 
+// Process processes the SwitchTimer.
+//
+// It takes a ScriptContext and a gpio.PinIO as parameters.
+// It returns an error.
 func (p *SwitchTimer) Process(ctx *ScriptContext, pin gpio.PinIO) error {
 	ctx.Logger.Debugf("process switchtimer %s", p.Name)
 
@@ -46,13 +57,10 @@ func (p *SwitchTimer) Process(ctx *ScriptContext, pin gpio.PinIO) error {
 		p.CurrentState = SwitchTimerStateOff
 		p.CurrentSpan = NewTimespan(time.Now(), p.OffDuration)
 
-		if p.pin != nil {
-			if p.Inverted {
-				p.pin.SetHigh()
-			} else {
-				p.pin.SetLow()
-			}
-
+		if p.Inverted {
+			p.pin.SetHigh()
+		} else {
+			p.pin.SetLow()
 		}
 
 		ctx.Logger.Infof("switchtimer %s turned off", p.Name)
@@ -63,16 +71,14 @@ func (p *SwitchTimer) Process(ctx *ScriptContext, pin gpio.PinIO) error {
 		if p.CurrentSpan.ContainsTime(time.Now()) {
 			return nil
 		}
+
 		p.CurrentState = SwitchTimerStateOn
 		p.CurrentSpan = NewTimespan(time.Now(), p.OnDuration)
 
-		if p.pin != nil {
-			if p.Inverted {
-				p.pin.SetLow()
-			} else {
-				p.pin.SetHigh()
-			}
-
+		if p.Inverted {
+			p.pin.SetLow()
+		} else {
+			p.pin.SetHigh()
 		}
 
 		ctx.Logger.Infof("switchtimer %s turned on", p.Name)
@@ -86,12 +92,10 @@ func (p *SwitchTimer) Process(ctx *ScriptContext, pin gpio.PinIO) error {
 		p.CurrentState = SwitchTimerStateOff
 		p.CurrentSpan = NewTimespan(time.Now(), p.OffDuration)
 
-		if p.pin != nil {
-			if p.Inverted {
-				p.pin.SetHigh()
-			} else {
-				p.pin.SetLow()
-			}
+		if p.Inverted {
+			p.pin.SetHigh()
+		} else {
+			p.pin.SetLow()
 		}
 
 		ctx.Logger.Infof("switchtimer %s turned off", p.Name)

@@ -47,6 +47,13 @@ func (p *ValueStore) Set(value float64) {
 	p.data = append(p.data, value)
 }
 
+// NewValueStore creates a new instance of ValueStore with the given capacity.
+//
+// Parameters:
+// - size: The capacity of the ValueStore.
+//
+// Returns:
+// - *ValueStore: A pointer to the newly created ValueStore.
 func NewValueStore(size int) *ValueStore {
 	return &ValueStore{
 		data:     []float64{},
@@ -75,6 +82,10 @@ type sensorStore struct {
 	capacity int
 }
 
+// Set sets the value of a sensor data in the sensor store.
+//
+// It takes a DataID and a float64 value as parameters.
+// It does not return anything.
 func (p *sensorStore) Set(id DataID, data float64) {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
@@ -88,6 +99,9 @@ func (p *sensorStore) Set(id DataID, data float64) {
 	store.Set(data)
 }
 
+// Get retrieves the value of a sensor data from the sensor store.
+//
+// It takes a DataID as a parameter and returns a float64.
 func (p *sensorStore) Get(id DataID) float64 {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
@@ -98,6 +112,12 @@ func (p *sensorStore) Get(id DataID) float64 {
 	return 0.0
 }
 
+// NewSensorStore creates a new instance of SensorStore with the given size.
+//
+// Parameters:
+// - size: The capacity of the SensorStore.
+// Returns:
+// - SensorStore: A pointer to the newly created SensorStore.
 func NewSensorStore(size int) SensorStore {
 	return &sensorStore{
 		data:     make(map[DataID]*ValueStore),

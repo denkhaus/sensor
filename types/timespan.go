@@ -22,6 +22,9 @@ type Span struct {
 	start, end time.Time
 }
 
+// GobEncode encodes the Span struct into a byte slice using gob encoding.
+//
+// It returns the encoded byte slice and an error if any occurred during encoding.
 func (p Span) GobEncode() ([]byte, error) {
 
 	b := bytes.NewBuffer(nil)
@@ -37,6 +40,10 @@ func (p Span) GobEncode() ([]byte, error) {
 	return b.Bytes(), nil
 }
 
+// GobDecode decodes the Span from the byte slice data.
+//
+// It decodes the start and end time of the span from the provided byte slice data.
+// Returns an error if decoding fails.
 func (p *Span) GobDecode(data []byte) error {
 
 	b := bytes.NewBuffer(data)
