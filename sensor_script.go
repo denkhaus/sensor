@@ -52,7 +52,7 @@ func processDosePump(ctx *types.ScriptContext, pumpStateID string, pinio gpio.Pi
 	fnCondition := func() bool {
 		hum := ctx.SensorStore.Get(store.Humidity)
 
-		if hum >= 60.0 {
+		if hum >= 50.0 {
 			cond := ctx.SensorStore.Get(store.Conductivity)
 			return cond >= ECMinThreshold && cond < ECMaxThreshold
 		}
