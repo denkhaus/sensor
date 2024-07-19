@@ -12,6 +12,8 @@ func init() {
 	Symbols["github.com/denkhaus/sensor/store/store"] = map[string]reflect.Value{
 		// function, constant and variable definitions
 		"Conductivity":            reflect.ValueOf(store.Conductivity),
+		"ConductivityRaw":         reflect.ValueOf(store.ConductivityRaw),
+		"ConductivityWeighted":    reflect.ValueOf(store.ConductivityWeighted),
 		"Embedded":                reflect.ValueOf(store.Embedded),
 		"ErrDatabaseNotCreated":   reflect.ValueOf(&store.ErrDatabaseNotCreated).Elem(),
 		"Get":                     reflect.ValueOf(store.Get),
@@ -20,6 +22,7 @@ func init() {
 		"IsDocumentNotFoundError": reflect.ValueOf(store.IsDocumentNotFoundError),
 		"NewEmbeddedStore":        reflect.ValueOf(store.NewEmbeddedStore),
 		"NewSensorStore":          reflect.ValueOf(store.NewSensorStore),
+		"NewValueStore":           reflect.ValueOf(store.NewValueStore),
 		"Salinity":                reflect.ValueOf(store.Salinity),
 		"Sensor":                  reflect.ValueOf(store.Sensor),
 		"Set":                     reflect.ValueOf(store.Set),
@@ -30,6 +33,7 @@ func init() {
 		"DataID":        reflect.ValueOf((*store.DataID)(nil)),
 		"EmbeddedStore": reflect.ValueOf((*store.EmbeddedStore)(nil)),
 		"SensorStore":   reflect.ValueOf((*store.SensorStore)(nil)),
+		"ValueStore":    reflect.ValueOf((*store.ValueStore)(nil)),
 
 		// interface wrapper definitions
 		"_EmbeddedStore": reflect.ValueOf((*_github_com_denkhaus_sensor_store_EmbeddedStore)(nil)),
