@@ -12,7 +12,7 @@ import (
 
 const (
 	ECMinThreshold            = 0.4
-	ECMaxThreshold            = 1.7
+	ECMaxThreshold            = 2.0
 	AquaPumpStateIDGreenhouse = "AquaPumpGreenhouse"
 	AquaPumpStateIDHydroRack  = "AquaPumpHydroRack"
 	DosePumpStateIDDefault    = "DosePumpDefault"
@@ -90,7 +90,7 @@ func Setup(ctx *types.ScriptContext) error {
 		Description:  "The greenhouse pump status",
 		Inverted:     true,
 		CurrentState: types.SwitchTimerStateInitialized,
-		OnDuration:   time.Second * 2,
+		OnDuration:   time.Second * 4,
 		OffDuration:  time.Minute * 10,
 	}
 

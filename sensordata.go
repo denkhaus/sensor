@@ -32,7 +32,10 @@ func (s *SensorData) Decode() string {
 		store.Set(store.Temperature, curTemp)
 		decodedValue = curTemp
 	case store.Conductivity:
-		cond := (float64(binary.BigEndian.Uint16(s.data[3:5])) / 1000.0) * 2.0
+		cond_raw := float64(binary.BigEndian.Uint16(s.data[3:5]))
+		store.Set(store.ConductivityRaw, cond_raw)
+
+		cond := (cond_raw / 1000.0) * 2.0
 		store.Set(store.Conductivity, cond)
 		decodedValue = cond
 	case store.Salinity:
@@ -43,17 +46,26 @@ func (s *SensorData) Decode() string {
 		store.Set(store.TDS, decodedValue)
 	}
 
+	cond := store.Get(store.Conductivity)
+	hum := store.Get(store.Humidity)
+	if hum > 0.0 {
+		weightedCond := (cond / hum)
+		store.Set(store.ConductivityWeighted, weightedCond)
+	}
+
 	return strconv.FormatFloat(decodedValue, 'f', 2, 64)
 }
 
 func (s *SensorData) Payload() ([]byte, error) {
 	data := map[string]interface{}{
 		"data": map[string]float64{
-			"humidity":     store.Get(store.Humidity),
-			"temperature":  store.Get(store.Temperature),
-			"conductivity": store.Get(store.Conductivity),
-			"salinity":     store.Get(store.Salinity),
-			"tds":          store.Get(store.TDS),
+			"humidity":              store.Get(store.Humidity),
+			"temperature":           store.Get(store.Temperature),
+			"conductivity":          store.Get(store.Conductivity),
+			"conductivity_weighted": store.Get(store.ConductivityWeighted),
+			"conductivity_raw":      store.Get(store.ConductivityRaw),
+			"salinity":              store.Get(store.Salinity),
+			"tds":                   store.Get(store.TDS),
 		},
 	}
 

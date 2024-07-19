@@ -69,6 +69,8 @@ const (
 	Conductivity
 	Salinity
 	TDS
+	ConductivityWeighted
+	ConductivityRaw
 )
 
 type SensorStore interface {
