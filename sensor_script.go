@@ -53,9 +53,12 @@ func processDosePump(ctx *types.ScriptContext, pumpStateID string, pinio gpio.Pi
 		hum := ctx.SensorStore.Get(store.Humidity)
 
 		if hum >= 50.0 {
-			cond := ctx.SensorStore.Get(store.Conductivity)
+			cond := ctx.SensorStore.Get(store.ConductivityWeighted)
 			return cond >= ECMinThreshold && cond < ECMaxThreshold
+		} else {
+			ctx.Logger.Warnf("humidity %f is too low", hum)
 		}
+
 		return false
 	}
 
@@ -118,12 +121,11 @@ func Setup(ctx *types.ScriptContext) error {
 
 func Script(ctx *types.ScriptContext) error {
 	condWeighted := ctx.SensorStore.Get(store.ConductivityWeighted)
-	condRaw := ctx.SensorStore.Get(store.ConductivityRaw)
 	cond := ctx.SensorStore.Get(store.Conductivity)
 	hum := ctx.SensorStore.Get(store.Humidity)
 	tds := ctx.SensorStore.Get(store.TDS)
 
-	ctx.Logger.Infof("EC: %f [w: %f|r: %f], Humidity: %f, TDS: %f", cond, condWeighted, condRaw, hum, tds)
+	ctx.Logger.Infof("EC:[w: %f|r: %f], Humidity: %f, TDS: %f", condWeighted, cond, hum, tds)
 
 	if err := processAquaPump(ctx, AquaPumpStateIDGreenhouse, rpi.P1_38); err != nil {
 		return err
