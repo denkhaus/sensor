@@ -94,7 +94,7 @@ func Setup(ctx *types.ScriptContext) error {
 		Inverted:     true,
 		CurrentState: types.SwitchTimerStateInitialized,
 		OnDuration:   time.Second * 4,
-		OffDuration:  time.Minute * 10,
+		OffDuration:  time.Minute * 5,
 	}
 
 	if err := ctx.EmbeddedStore.Upsert(status2.Name, status2); err != nil {
