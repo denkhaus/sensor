@@ -93,7 +93,7 @@ func Setup(ctx *types.ScriptContext) error {
 		Description:  "The greenhouse pump status",
 		Inverted:     true,
 		CurrentState: types.SwitchTimerStateInitialized,
-		OnDuration:   time.Second * 4,
+		OnDuration:   time.Second * 20,
 		OffDuration:  time.Minute * 5,
 	}
 
@@ -109,7 +109,7 @@ func Setup(ctx *types.ScriptContext) error {
 		Inverted:     true,
 		CurrentState: types.SwitchTimerStateInitialized,
 		OnDuration:   time.Second * 10,
-		OffDuration:  time.Second * 20,
+		OffDuration:  time.Second * 40,
 	}
 
 	if err := ctx.EmbeddedStore.Upsert(status3.Name, status3); err != nil {
