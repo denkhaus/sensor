@@ -29,7 +29,7 @@ build_arm64: create_bin_dir
 .PHONY: reset_database
 reset_database:
 	@echo "Resetting database..."
-	@rm -r /home/denkhaus/.local/share/sensor
+	-@rm -r /home/denkhaus/.local/share/sensor
 
 .PHONY: stop_service
 stop_service:
@@ -50,5 +50,5 @@ pull:
 	@git pull origin master
 	@echo "Pulling latest changes from the repository... done"
 
-rebuild_arm: pull build_arm64 restart_service
+rebuild: pull build_arm64 restart_service
 	@echo "Rebuilding arm64 version and restarting service... done"
