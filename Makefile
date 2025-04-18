@@ -15,14 +15,14 @@ create_bin_dir:
 .PHONY: generate
 generate: install_yaegi
 	go generate symbols/generate.go
-	
+
 .PHONY: build_amd64
 build_amd64: create_bin_dir
 	CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -o bin/sensor_amd64_linux -trimpath \
-	-ldflags "-s -w -X main.BuildCommit=$(GIT_COMMIT) -X main.BuildVersion=$(GIT_TAG) -X main.BuildDate=$(BUILD_DATE) -extldflags=-static" *.go	
+	-ldflags "-s -w -X main.BuildCommit=$(GIT_COMMIT) -X main.BuildVersion=$(GIT_TAG) -X main.BuildDate=$(BUILD_DATE) -extldflags=-static" *.go
 
 .PHONY: build_arm64
-build_arm64: create_bin_dir	
+build_arm64: create_bin_dir
 	CGO_ENABLED=0 GOARCH=arm64 GOOS=linux go build -o bin/sensor_arm64_linux -trimpath \
 	-ldflags "-s -w -X main.BuildCommit=$(GIT_COMMIT) -X main.BuildVersion=$(GIT_TAG) -X main.BuildDate=$(BUILD_DATE) -extldflags=-static" *.go
 
@@ -33,3 +33,11 @@ restart_service:
 	@sudo systemctl stop sensor.service
 	-@rm -r /home/denkhaus/.local/share/sensor
 	@sudo systemctl start sensor.service
+
+pull:
+	@echo "Pulling latest changes from the repository..."
+	git pull origin master
+	@echo "Pulling latest changes from the repository... done"
+
+rebuild_arm: pull build_arm64 restart_service
+	@echo "Rebuilding arm64 version and restarting service... done"
