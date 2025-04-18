@@ -52,3 +52,6 @@ pull:
 
 rebuild: pull build_arm64 restart_service
 	@echo "Rebuilding arm64 version and restarting service... done"
+
+logs:
+	@sudo journalctl -u sensor -f
