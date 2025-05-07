@@ -47,10 +47,11 @@ func (s *SensorData) Decode() string {
 	}
 
 	cond := store.Get(store.Conductivity)
-	hum := store.Get(store.Humidity)
-	if hum > 0.0 {
-		weightedCond := (cond / hum) * 100.0
-		store.Set(store.ConductivityWeighted, weightedCond)
+	temp := store.Get(store.Temperature)
+
+	if cond > 0.0 && temp > 0.0 {
+		weightedCond25 := cond/1 + 0.02*(temp-25.0)
+		store.Set(store.ConductivityWeighted, weightedCond25)
 	}
 
 	return strconv.FormatFloat(decodedValue, 'f', 2, 64)
