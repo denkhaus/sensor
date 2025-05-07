@@ -122,10 +122,11 @@ func Setup(ctx *types.ScriptContext) error {
 func Script(ctx *types.ScriptContext) error {
 	condWeighted := ctx.SensorStore.Get(store.ConductivityWeighted)
 	cond := ctx.SensorStore.Get(store.Conductivity)
+	temp := ctx.SensorStore.Get(store.Temperature)
 	hum := ctx.SensorStore.Get(store.Humidity)
 	tds := ctx.SensorStore.Get(store.TDS)
 
-	ctx.Logger.Infof("EC:[w: %f|r: %f], Humidity: %f, TDS: %f", condWeighted, cond, hum, tds)
+	ctx.Logger.Infof("EC:[w: %f|r: %f], Humidity: %f, TDS: %f, Temp: %f", condWeighted, cond, hum, tds, temp)
 
 	if err := processAquaPump(ctx, AquaPumpStateIDGreenhouse, rpi.P1_38); err != nil {
 		return err
