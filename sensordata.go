@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"strconv"
 
+	"github.com/denkhaus/containers"
 	"github.com/denkhaus/sensor/store"
 )
 
@@ -25,25 +26,33 @@ func (s *SensorData) Decode() string {
 
 	switch s.id {
 	case store.Humidity:
-		decodedValue = float64(binary.BigEndian.Uint16(s.data[3:5])) / 10.0
-		store.Set(store.Humidity, decodedValue)
+		cur_hum := float64(binary.BigEndian.Uint16(s.data[3:5])) / 10.0
+		cur_hum = containers.Max(0.0, cur_hum)
+		cur_hum = containers.Min(100.0, cur_hum)
+		store.Set(store.Humidity, cur_hum)
+		decodedValue = cur_hum
 	case store.Temperature:
-		curTemp := float64(binary.BigEndian.Uint16(s.data[3:5])) / 10.0
-		store.Set(store.Temperature, curTemp)
-		decodedValue = curTemp
+		cur_temp := float64(binary.BigEndian.Uint16(s.data[3:5])) / 10.0
+		cur_temp = containers.Max(0.0, cur_temp)
+		cur_temp = containers.Min(35.0, cur_temp)
+		store.Set(store.Temperature, cur_temp)
+		decodedValue = cur_temp
 	case store.Conductivity:
 		cond_raw := float64(binary.BigEndian.Uint16(s.data[3:5]))
+		cond_raw = containers.Max(0.0, cond_raw)
+		cond_raw = containers.Min(3.0, cond_raw)
 		store.Set(store.ConductivityRaw, cond_raw)
-
 		cond := (cond_raw / 1000.0)
 		store.Set(store.Conductivity, cond)
 		decodedValue = cond
 	case store.Salinity:
-		decodedValue = float64(binary.BigEndian.Uint16(s.data[3:5]))
-		store.Set(store.Salinity, decodedValue)
+		cur_sal := float64(binary.BigEndian.Uint16(s.data[3:5]))
+		store.Set(store.Salinity, cur_sal)
+		decodedValue = cur_sal
 	case store.TDS:
-		decodedValue = float64(binary.BigEndian.Uint16(s.data[3:5]))
-		store.Set(store.TDS, decodedValue)
+		cur_tds := float64(binary.BigEndian.Uint16(s.data[3:5]))
+		store.Set(store.TDS, cur_tds)
+		decodedValue = cur_tds
 	}
 
 	cond := store.Get(store.Conductivity)
