@@ -1,16 +1,19 @@
 module github.com/denkhaus/sensor
 
-go 1.22.1
+go 1.23
+
+toolchain go1.24.0
 
 require (
 	github.com/davecgh/go-spew v1.1.1
+	github.com/denkhaus/containers v0.0.0-20250207131140-854db1eeb276
 	github.com/dgraph-io/badger/v4 v4.1.0
 	github.com/muesli/go-app-paths v0.2.2
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/traefik/yaegi v0.16.1
 	go.bug.st/serial v1.6.2
-	golang.org/x/sync v0.1.0
+	golang.org/x/sync v0.10.0
 )
 
 require (
@@ -28,6 +31,7 @@ require (
 	github.com/klauspost/compress v1.16.5 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
+	golang.org/x/exp v0.0.0-20250103183323-7d7fa50e5329 // indirect
 	golang.org/x/net v0.10.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 )
