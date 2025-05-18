@@ -20,7 +20,7 @@ type ValueStore struct {
 // Returns:
 // - float64: the average value stored in the ValueStore, or 0 if there are no values.
 func (p *ValueStore) GetAverage() float64 {
-	if len(p.data) == 0 {
+	if len(p.data) < p.capacity {
 		return 0.0
 	}
 
