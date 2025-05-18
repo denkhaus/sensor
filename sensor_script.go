@@ -3,7 +3,6 @@ package main
 import (
 	"time"
 
-	"github.com/denkhaus/containers"
 	"github.com/denkhaus/sensor/store"
 	"github.com/denkhaus/sensor/types"
 	"github.com/pkg/errors"
@@ -36,7 +35,7 @@ func durationCallback(onDuration time.Duration, offDuration time.Duration) (time
 
 	// Increase the offDuration if the hour is between 0 and 8
 	// This is to enable a night mode where the pump runs less often
-	if containers.BetweenInclusive(0, 8, hour) {
+	if 0 <= hour && hour <= 8 {
 		offDuration *= 2
 	}
 
