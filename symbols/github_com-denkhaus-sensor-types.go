@@ -16,6 +16,7 @@ func init() {
 		"SwitchTimerStateOn":          reflect.ValueOf(types.SwitchTimerStateOn),
 
 		// type definitions
+		"DurationCallback": reflect.ValueOf((*types.DurationCallback)(nil)),
 		"PulseTimer":       reflect.ValueOf((*types.PulseTimer)(nil)),
 		"ScriptContext":    reflect.ValueOf((*types.ScriptContext)(nil)),
 		"Span":             reflect.ValueOf((*types.Span)(nil)),
