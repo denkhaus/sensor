@@ -3,6 +3,7 @@ package main
 import (
 	"time"
 
+	"github.com/denkhaus/containers"
 	"github.com/denkhaus/sensor/store"
 	"github.com/denkhaus/sensor/types"
 	"github.com/pkg/errors"
@@ -12,7 +13,7 @@ import (
 
 const (
 	ECMinThreshold            = 0.4
-	ECMaxThreshold            = 2.2
+	ECMaxThreshold            = 2.0
 	AquaPumpStateIDGreenhouse = "AquaPumpGreenhouse"
 	AquaPumpStateIDHydroRack  = "AquaPumpHydroRack"
 	DosePumpStateIDDefault    = "DosePumpDefault"
@@ -30,13 +31,25 @@ func readDosePumpState(ctx *types.ScriptContext, dosePumpStateID string) (*types
 	return &pumpState, err
 }
 
+func durationCallback(onDuration time.Duration, offDuration time.Duration) (time.Duration, time.Duration) {
+	hour := time.Now().Hour()
+
+	// Increase the offDuration if the hour is between 0 and 8
+	// This is to enable a night mode where the pump runs less often
+	if containers.BetweenInclusive(0, 8, hour) {
+		offDuration *= 2
+	}
+
+	return onDuration, offDuration
+}
+
 func processAquaPump(ctx *types.ScriptContext, pumpStateID string, pinio gpio.PinIO) error {
 	ps, err := readAquaPumpState(ctx, pumpStateID)
 	if err != nil {
 		return errors.Wrapf(err, "readAquaPumpState %s", pumpStateID)
 	}
 
-	if err := ps.Process(ctx, pinio); err != nil {
+	if err := ps.Process(ctx, durationCallback, pinio); err != nil {
 		return errors.Wrapf(err, "process aqua pump %s", pumpStateID)
 	}
 

@@ -5,7 +5,7 @@ go 1.23
 toolchain go1.24.0
 
 require (
-	github.com/davecgh/go-spew v1.1.1
+	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/denkhaus/containers v0.0.0-20250207131140-854db1eeb276
 	github.com/dgraph-io/badger/v4 v4.1.0
 	github.com/muesli/go-app-paths v0.2.2
@@ -13,7 +13,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/traefik/yaegi v0.16.1
 	go.bug.st/serial v1.6.2
-	golang.org/x/sync v0.10.0
+	golang.org/x/sync v0.12.0
 )
 
 require (

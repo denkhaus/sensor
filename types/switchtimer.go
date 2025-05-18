@@ -12,6 +12,8 @@ func init() {
 	gob.Register(SwitchTimer{})
 }
 
+type DurationCallback func(onDuration time.Duration, offDuration time.Duration) (time.Duration, time.Duration)
+
 type SwitchTimerState int
 
 const (
@@ -46,16 +48,25 @@ func (p *SwitchTimer) Write(ctx *ScriptContext) error {
 //
 // It takes a ScriptContext and a gpio.PinIO as parameters.
 // It returns an error.
-func (p *SwitchTimer) Process(ctx *ScriptContext, pin gpio.PinIO) error {
+func (p *SwitchTimer) Process(ctx *ScriptContext, dcb DurationCallback, pin gpio.PinIO) error {
 	ctx.Logger.Debugf("process switchtimer %s", p.Name)
 
 	if p.pin == nil {
 		p.pin = io.NewPin(pin)
 	}
 
+	var onDuration, offDuration time.Duration
+
+	if dcb != nil {
+		onDuration, offDuration = dcb(p.OnDuration, p.OffDuration)
+	} else {
+		onDuration = p.OnDuration
+		offDuration = p.OffDuration
+	}
+
 	if p.CurrentState == SwitchTimerStateInitialized {
 		p.CurrentState = SwitchTimerStateOff
-		p.CurrentSpan = NewTimespan(time.Now(), p.OffDuration)
+		p.CurrentSpan = NewTimespan(time.Now(), offDuration)
 
 		if p.Inverted {
 			p.pin.SetHigh()
@@ -73,7 +84,7 @@ func (p *SwitchTimer) Process(ctx *ScriptContext, pin gpio.PinIO) error {
 		}
 
 		p.CurrentState = SwitchTimerStateOn
-		p.CurrentSpan = NewTimespan(time.Now(), p.OnDuration)
+		p.CurrentSpan = NewTimespan(time.Now(), onDuration)
 
 		if p.Inverted {
 			p.pin.SetLow()
