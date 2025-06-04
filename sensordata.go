@@ -9,7 +9,7 @@ import (
 	"github.com/denkhaus/sensor/store"
 )
 
-const ConductivityDelta = 1.52
+const ConductivityDelta = 1.82
 
 type SensorData struct {
 	id   store.DataID
