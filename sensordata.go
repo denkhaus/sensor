@@ -9,8 +9,6 @@ import (
 	"github.com/denkhaus/sensor/store"
 )
 
-const ConductivityDelta = 0.82
-
 type SensorData struct {
 	id   store.DataID
 	data []byte
@@ -63,7 +61,7 @@ func (s *SensorData) Decode() string {
 	temp := store.Get(store.Temperature)
 
 	if cond > 0.0 && temp > 0.0 {
-		weightedCond25 := (cond / (1 + 0.02*(temp-25.0))) + ConductivityDelta
+		weightedCond25 := cond * (1 + 0.02*(25.0-temp))
 		store.Set(store.ConductivityWeighted, weightedCond25)
 	}
 
