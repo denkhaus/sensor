@@ -9,7 +9,7 @@ import (
 	"github.com/denkhaus/sensor/store"
 )
 
-const ConductivityDelta = 1.82
+const ConductivityDelta = 0.82
 
 type SensorData struct {
 	id   store.DataID
@@ -47,7 +47,7 @@ func (s *SensorData) Decode() string {
 		cond = containers.Max(0.0, cond)
 		cond = containers.Min(5.0, cond)
 
-		store.Set(store.Conductivity, cond)
+		store.Set(store.Conductivity, cond+1.0)
 		decodedValue = cond
 	case store.Salinity:
 		cur_sal := float64(binary.BigEndian.Uint16(s.data[3:5]))
