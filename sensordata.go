@@ -41,11 +41,17 @@ func (s *SensorData) Decode() string {
 		cond_raw := float64(binary.BigEndian.Uint16(s.data[3:5]))
 		store.Set(store.ConductivityRaw, cond_raw)
 
-		cond := (cond_raw / 1000.0)
+		humidityDelta := 1.0
+		humidity := store.Get(store.Humidity)
+		if humidity != 0.0 {
+			humidityDelta = 100.0 / humidity
+		}
+
+		cond := ((cond_raw / 1000.0) * humidityDelta) + 1.0
 		cond = containers.Max(0.0, cond)
 		cond = containers.Min(5.0, cond)
 
-		store.Set(store.Conductivity, cond+1.0)
+		store.Set(store.Conductivity, cond)
 		decodedValue = cond
 	case store.Salinity:
 		cur_sal := float64(binary.BigEndian.Uint16(s.data[3:5]))
