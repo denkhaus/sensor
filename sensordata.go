@@ -9,6 +9,10 @@ import (
 	"github.com/denkhaus/sensor/store"
 )
 
+const (
+	ConductivityDelta = 0.8
+)
+
 type SensorData struct {
 	id   store.DataID
 	data []byte
@@ -47,7 +51,7 @@ func (s *SensorData) Decode() string {
 			humidityDelta = 100.0 / humidity
 		}
 
-		cond := ((cond_raw / 1000.0) * humidityDelta) + 1.0
+		cond := (((cond_raw / 1000.0) * humidityDelta) + 1.0) * ConductivityDelta
 		cond = containers.Max(0.0, cond)
 		cond = containers.Min(5.0, cond)
 
