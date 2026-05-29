@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	ConductivityDelta = 0.8
+	ConductivityDelta = 0.4
 )
 
 type SensorData struct {
