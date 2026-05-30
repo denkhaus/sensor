@@ -12,7 +12,7 @@ import (
 
 const (
 	ECMinThreshold            = 0.4
-	ECMaxThreshold            = 1.5
+	ECMaxThreshold            = 1.0
 	AquaPumpStateIDGreenhouse = "AquaPumpGreenhouse"
 	AquaPumpStateIDHydroRack  = "AquaPumpHydroRack"
 	DosePumpStateIDDefault    = "DosePumpDefault"
@@ -121,7 +121,7 @@ func Setup(ctx *types.ScriptContext) error {
 		Inverted:     true,
 		CurrentState: types.SwitchTimerStateInitialized,
 		OnDuration:   time.Second * 10,
-		OffDuration:  time.Second * 120,
+		OffDuration:  time.Second * 60,
 	}
 
 	if err := ctx.EmbeddedStore.Upsert(status3.Name, status3); err != nil {
